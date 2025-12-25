@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Grid3x3, Workflow, Settings, LogOut } from "lucide-react";
+import { Home, Grid3x3, Workflow, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -37,40 +37,35 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar className="border-r border-border/40 bg-gradient-to-b from-primary-900 to-primary-800 text-white">
-      <SidebarHeader className="border-b border-white/10 px-6 py-6">
+    <Sidebar className="border-r border-border bg-white">
+      <SidebarHeader className="border-b border-border/10 px-6 py-4">
         <Link href="/" className="flex items-center gap-3">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-lg bg-cyan-400 blur-md opacity-50" />
-            <div className="relative rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 p-2">
-              <Home className="h-6 w-6 text-white" />
-            </div>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Home className="h-6 w-6" />
           </div>
-          <span className="text-xl font-bold tracking-tight">Smart Home</span>
+          <span className="text-xl font-bold tracking-tight text-foreground">MyHouseOS</span>
         </Link>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="px-4 py-4">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-2 px-3 py-4">
+            <SidebarMenu className="gap-2">
               {menuItems.map((item) => {
                 const isActive = pathname === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      className={`group relative overflow-hidden transition-all duration-200 ${
+                      isActive={isActive}
+                      className={`h-auto w-full justify-start gap-3 px-4 py-3 transition-colors ${
                         isActive
-                          ? "bg-white/20 text-white shadow-lg shadow-cyan-500/20"
-                          : "text-white/70 hover:bg-white/10 hover:text-white"
+                          ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary border-l-4 border-primary font-medium rounded-r-md rounded-l-none"
+                          : "text-muted-foreground hover:bg-accent hover:text-foreground"
                       }`}
                     >
-                      <Link href={item.url} className="flex items-center gap-3 px-4 py-3">
-                        {isActive && (
-                          <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-cyan-400 to-blue-500 glow-cyan" />
-                        )}
+                      <Link href={item.url}>
                         <item.icon className="h-5 w-5" />
-                        <span className="font-medium">{item.title}</span>
+                        <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -80,19 +75,14 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="border-t border-white/10 p-4">
+      <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="text-white/70 hover:bg-white/10 hover:text-white">
-              <Link href="/settings" className="flex items-center gap-3 px-4 py-3">
-                <Settings className="h-5 w-5" />
-                <span>Paramètres</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild className="text-white/70 hover:bg-white/10 hover:text-white">
-              <Link href="/login" className="flex items-center gap-3 px-4 py-3">
+            <SidebarMenuButton 
+              asChild 
+              className="h-auto w-full justify-start gap-3 px-4 py-3 text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              <Link href="/login">
                 <LogOut className="h-5 w-5" />
                 <span>Log out</span>
               </Link>
