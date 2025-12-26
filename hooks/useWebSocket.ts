@@ -20,7 +20,6 @@ export function useWebSocket() {
   const isConnectingRef = useRef(false);
 
   const connect = useCallback(() => {
-    // Prevent multiple simultaneous connection attempts
     if (
       isConnectingRef.current ||
       wsRef.current?.readyState === WebSocket.OPEN
@@ -49,10 +48,8 @@ export function useWebSocket() {
           console.log("[WS] Message received:", message.type);
 
           if (message.type === "INIT") {
-            // Initial state received
             setHomeState(message.data as HomeState);
           } else if (message.type === "UPDATE") {
-            // State update received - matches eventBus.emit(EVENTS.STATE_CHANGE, { type, value })
             const update = message.data as { type: EventType; value: string };
             console.log("[WS] State update:", update.type, "=", update.value);
 
@@ -83,8 +80,6 @@ export function useWebSocket() {
       };
 
       ws.onerror = () => {
-        // WebSocket error events don't contain useful info in browsers
-        // The actual error will be logged in onclose
         console.warn("[WS] Connection error occurred");
         isConnectingRef.current = false;
         setConnectionError("Connection error - server may be unreachable");
@@ -100,7 +95,6 @@ export function useWebSocket() {
         setIsConnected(false);
         wsRef.current = null;
 
-        // Provide more helpful error messages based on close code
         if (event.code === 1006) {
           setConnectionError(
             "Connection lost - server unreachable or CORS issue"
@@ -109,7 +103,6 @@ export function useWebSocket() {
           setConnectionError(`Connection closed (code: ${event.code})`);
         }
 
-        // Attempt to reconnect with exponential backoff
         const timeout = Math.min(1000 * Math.pow(2, reconnectAttempt), 30000);
         console.log(
           `[WS] Reconnecting in ${timeout}ms (attempt ${reconnectAttempt + 1})`

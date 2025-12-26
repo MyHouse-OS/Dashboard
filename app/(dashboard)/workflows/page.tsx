@@ -75,7 +75,6 @@ export default function WorkflowsPage() {
         </Button>
       </div>
 
-      {/* Search */}
       <Card>
         <CardHeader>
           <CardTitle>Mes Workflows</CardTitle>
@@ -93,7 +92,6 @@ export default function WorkflowsPage() {
         </CardContent>
       </Card>
 
-      {/* Workflows Table */}
       <Card>
         <CardContent className="p-0">
           <div className="overflow-hidden rounded-lg border border-border/50">
@@ -173,7 +171,6 @@ export default function WorkflowsPage() {
         </CardContent>
       </Card>
 
-      {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-green-500/20 bg-gradient-to-br from-green-50 to-white dark:from-green-950/20 dark:to-slate-900">
           <CardHeader className="pb-3">

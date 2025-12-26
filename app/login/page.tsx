@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,17 +10,17 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
 
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
-    // Hardcoded credentials: root/root
-    if (email === "root" && password === "root") {
-      // Set auth cookie
+
+    const validUsername = process.env.NEXT_PUBLIC_LOGIN_USERNAME || "root";
+    const validPassword = process.env.NEXT_PUBLIC_LOGIN_PASSWORD || "root";
+
+    if (email === validUsername && password === validPassword) {
       document.cookie = "auth=true; path=/";
       window.location.href = "/";
     } else {
@@ -31,7 +30,6 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      {/* Animated background effects */}
       <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
       <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl animate-pulse" />
       <div className="absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full bg-cyan-500/20 blur-3xl animate-pulse [animation-delay:1s]" />

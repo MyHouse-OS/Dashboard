@@ -14,21 +14,21 @@ const mockDevices: Device[] = [
     name: "ESP32 Server",
     type: "Contrôleur Principal",
     status: "online",
-    ip: "192.168.4.1",
+    ip: process.env.NEXT_PUBLIC_SERVER_IP || "192.168.4.1",
   },
   {
     id: "2",
     name: "ESP32 Client 1",
     type: "Salon",
     status: "online",
-    ip: "192.168.4.3",
+    ip: process.env.NEXT_PUBLIC_CLIENT1_IP || "192.168.4.3",
   },
   {
     id: "3",
     name: "ESP32 Client 2",
     type: "Chambre",
     status: "online",
-    ip: "192.168.4.4",
+    ip: process.env.NEXT_PUBLIC_CLIENT2_IP || "192.168.4.4",
   },
 ];
 
@@ -50,7 +50,6 @@ export default function AppareilsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Appareils</h2>
@@ -64,7 +63,6 @@ export default function AppareilsPage() {
         </Button>
       </div>
 
-      {/* Search */}
       <Card>
         <CardHeader>
           <CardTitle>Mes Appareils</CardTitle>
@@ -82,7 +80,6 @@ export default function AppareilsPage() {
         </CardContent>
       </Card>
 
-      {/* Devices Table */}
       <Card>
         <CardContent className="p-0">
           <div className="overflow-hidden rounded-lg border border-border/50">
@@ -177,7 +174,6 @@ export default function AppareilsPage() {
         </CardContent>
       </Card>
 
-      {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-green-500/20 bg-gradient-to-br from-green-50 to-white dark:from-green-950/20 dark:to-slate-900">
           <CardHeader className="pb-3">

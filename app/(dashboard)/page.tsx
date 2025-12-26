@@ -66,7 +66,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Stats */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="border-blue-500/20 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-slate-900">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -138,7 +137,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Heating Control */}
         <Card className="relative overflow-hidden">
           <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-blue-500/5 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between">
@@ -151,7 +149,6 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Temperature Gauge */}
             <div className="flex items-center justify-center">
               <div className="relative">
                 <svg className="h-48 w-48 -rotate-90" viewBox="0 0 200 200">
@@ -187,7 +184,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Controls */}
             <div className="flex items-center justify-between rounded-lg border border-border/50 bg-secondary/30 p-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -219,7 +215,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Toggle Switch */}
             <div className="flex items-center justify-between rounded-lg border border-border/50 bg-secondary/30 p-4">
               <div className="flex items-center gap-2">
                 <Flame
@@ -238,9 +233,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Presence & Controls */}
         <div className="space-y-6">
-          {/* Presence Card */}
           <Card className="relative overflow-hidden">
             <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-green-500/5 to-transparent" />
             <CardHeader className="flex flex-row items-center justify-between">
@@ -268,7 +261,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Device Controls */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -335,7 +327,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Programming Schedule */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -352,7 +343,6 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* History */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">

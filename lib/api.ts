@@ -1,7 +1,6 @@
-const API_URL = "http://192.168.4.2:3000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.4.2:3000";
 
-// Auth credentials (format: id:token)
-const AUTH_HEADER = "root:root";
+const AUTH_HEADER = `${process.env.NEXT_PUBLIC_AUTH_ID || "root"}:${process.env.NEXT_PUBLIC_AUTH_TOKEN || "root"}`;
 
 const getHeaders = () => ({
   "Content-Type": "application/json",

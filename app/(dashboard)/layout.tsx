@@ -29,7 +29,7 @@ export default function DashboardLayout({
   }, [router]);
 
   if (!isAuthenticated) {
-    return null; // Loading or redirecting
+    return null;
   }
 
   return (
