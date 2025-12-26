@@ -2,20 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Toaster } from "sonner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ConnectionStatus } from "@/components/connection-status";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Bell } from "lucide-react";
-import { useWebSocket } from "@/hooks/useWebSocket";
+import { WebSocketProvider, useWebSocketContext } from "@/contexts/WebSocketContext";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { isConnected, connectionError, reconnectAttempt } = useWebSocket();
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+  const { isConnected, connectionError, reconnectAttempt } = useWebSocketContext();
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -66,6 +63,19 @@ export default function DashboardLayout({
           </div>
         </div>
       </SidebarProvider>
+      <Toaster position="top-right" richColors closeButton />
     </TooltipProvider>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <WebSocketProvider>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </WebSocketProvider>
   );
 }

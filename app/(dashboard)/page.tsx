@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { useWebSocket } from "@/hooks/useWebSocket";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
+import { usePresenceDetection } from "@/hooks/usePresenceDetection";
 import { toggleHeat, toggleLight, toggleDoor, getHistory } from "@/lib/api";
 import type { HistoryEvent } from "@/types";
 import {
@@ -21,7 +23,8 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
-  const { homeState } = useWebSocket();
+  const { homeState } = useWebSocketContext();
+  const presenceStatus = usePresenceDetection(homeState);
   const [isToggling, setIsToggling] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryEvent[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
@@ -45,7 +48,9 @@ export default function DashboardPage() {
 
   const handleToggle = async (type: "light" | "door" | "heat") => {
     setIsToggling(type);
+
     try {
+      console.log(`[Toggle] Attempting to toggle ${type}...`);
       switch (type) {
         case "light":
           await toggleLight();
@@ -57,8 +62,17 @@ export default function DashboardPage() {
           await toggleHeat();
           break;
       }
+      console.log(`[Toggle] ${type} toggled successfully`);
     } catch (error) {
-      console.error(`Error toggling ${type}:`, error);
+      console.error(`[Toggle] Error toggling ${type}:`, error);
+      const labels = {
+        light: "la lumière",
+        door: "la porte",
+        heat: "le chauffage"
+      };
+      toast.error(`Erreur`, {
+        description: `Impossible de modifier ${labels[type]}: ${error instanceof Error ? error.message : "Erreur inconnue"}`,
+      });
     } finally {
       setIsToggling(null);
     }
@@ -138,7 +152,7 @@ export default function DashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="relative overflow-hidden">
-          <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-blue-500/5 to-transparent" />
+          <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-blue-500/5 to-transparent pointer-events-none" />
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Flame className="h-5 w-5 text-orange-500" />
@@ -235,29 +249,82 @@ export default function DashboardPage() {
 
         <div className="space-y-6">
           <Card className="relative overflow-hidden">
-            <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-green-500/5 to-transparent" />
+            <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-green-500/5 to-transparent pointer-events-none" />
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-500" />
                 Présence
               </CardTitle>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
+              <Badge
+                variant={presenceStatus.isPresent ? "default" : "secondary"}
+                className={
+                  presenceStatus.isPresent
+                    ? presenceStatus.confidence === "high"
+                      ? "bg-green-500"
+                      : presenceStatus.confidence === "medium"
+                      ? "bg-yellow-500"
+                      : "bg-orange-500"
+                    : "bg-gray-500"
+                }
+              >
+                {presenceStatus.confidence === "high"
+                  ? "Certaine"
+                  : presenceStatus.confidence === "medium"
+                  ? "Probable"
+                  : presenceStatus.isPresent
+                  ? "Possible"
+                  : "Absente"}
+              </Badge>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="rounded-full bg-blue-500/10 p-4">
-                  <Users className="h-10 w-10 text-blue-500" />
+                <div
+                  className={`rounded-full p-4 ${
+                    presenceStatus.isPresent
+                      ? "bg-blue-500/10"
+                      : "bg-gray-500/10"
+                  }`}
+                >
+                  <Users
+                    className={`h-10 w-10 ${
+                      presenceStatus.isPresent
+                        ? "text-blue-500"
+                        : "text-gray-400"
+                    }`}
+                  />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">Maison occupée</div>
+                  <div className="text-2xl font-bold">
+                    {presenceStatus.isPresent
+                      ? "Maison occupée"
+                      : "Maison vide"}
+                  </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                    Mouvements détectés
+                    {presenceStatus.isPresent && (
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          presenceStatus.confidence === "high"
+                            ? "bg-green-500 animate-pulse"
+                            : presenceStatus.confidence === "medium"
+                            ? "bg-yellow-500 animate-pulse"
+                            : "bg-orange-500"
+                        }`}
+                      />
+                    )}
+                    {presenceStatus.reason}
                   </div>
                 </div>
               </div>
+              {presenceStatus.lastActivity && (
+                <div className="text-xs text-muted-foreground border-t border-border/50 pt-3">
+                  Dernière activité :{" "}
+                  {presenceStatus.lastActivity.toLocaleTimeString("fr-FR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
 
