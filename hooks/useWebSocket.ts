@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { toast } from "sonner";
 import type { HomeState, WSMessage, EventType } from "@/types";
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://192.168.4.2:3000/ws";
@@ -55,19 +56,97 @@ export function useWebSocket() {
 
             setHomeState((prev) => {
               const newState = { ...prev };
+              const prevTemp = parseFloat(prev.temperature) || 0;
 
               switch (update.type) {
                 case "TEMPERATURE":
                   newState.temperature = update.value;
+                  const newTemp = parseFloat(update.value) || 0;
+
+                  if (Math.abs(newTemp - prevTemp) > 2 && prevTemp !== 0) {
+                    const toastId = `temp-${newTemp}`;
+                    if (newTemp > prevTemp) {
+                      toast.success("Température en hausse", {
+                        id: toastId,
+                        description: `${prevTemp.toFixed(1)}°C → ${newTemp.toFixed(1)}°C`,
+                        duration: 5000,
+                      });
+                    } else {
+                      toast.info("Température en baisse", {
+                        id: toastId,
+                        description: `${prevTemp.toFixed(1)}°C → ${newTemp.toFixed(1)}°C`,
+                        duration: 5000,
+                      });
+                    }
+                  }
                   break;
+
                 case "LIGHT":
                   newState.light = update.value === "true";
+                  const lightId = `light-${update.value}`;
+                  if (update.value === "true") {
+                    toast.success("💡 Lumière allumée", {
+                      id: lightId,
+                      description: "Éclairage activé",
+                      duration: 4000,
+                    });
+                  } else {
+                    toast.info("💡 Lumière éteinte", {
+                      id: lightId,
+                      description: "Éclairage désactivé",
+                      duration: 4000,
+                    });
+                  }
                   break;
+
                 case "DOOR":
                   newState.door = update.value === "true";
+                  const doorId = `door-${update.value}`;
+                  if (update.value === "true") {
+                    toast.success("🚪 Porte ouverte", {
+                      id: doorId,
+                      description: "Accès détecté",
+                      duration: 4000,
+                    });
+                    if (prev.heat) {
+                      toast.warning("⚠️ Porte ouverte avec chauffage actif", {
+                        id: "door-heat-warning",
+                        description: "Pensez à fermer la porte pour économiser l'énergie",
+                        duration: 7000,
+                      });
+                    }
+                  } else {
+                    toast.info("🚪 Porte fermée", {
+                      id: doorId,
+                      description: "Accès sécurisé",
+                      duration: 4000,
+                    });
+                  }
                   break;
+
                 case "HEAT":
                   newState.heat = update.value === "true";
+                  const heatId = `heat-${update.value}`;
+                  if (update.value === "true") {
+                    toast.success("🔥 Chauffage activé", {
+                      id: heatId,
+                      description: `Mode confort - Température actuelle: ${prevTemp.toFixed(1)}°C`,
+                      duration: 5000,
+                    });
+                    if (prevTemp >= 25) {
+                      toast.warning("🌡️ Température élevée détectée", {
+                        id: "heat-temp-warning",
+                        description: `${prevTemp.toFixed(1)}°C - Le chauffage pourrait être inutile`,
+                        duration: 7000,
+                      });
+                    }
+                  } else {
+                    toast.info("🔥 Chauffage désactivé", {
+                      id: heatId,
+                      description: `Mode éco - Température actuelle: ${prevTemp.toFixed(1)}°C`,
+                      duration: 5000,
+                    });
+                  }
                   break;
               }
 
@@ -103,15 +182,19 @@ export function useWebSocket() {
           setConnectionError(`Connection closed (code: ${event.code})`);
         }
 
-        const timeout = Math.min(1000 * Math.pow(2, reconnectAttempt), 30000);
-        console.log(
-          `[WS] Reconnecting in ${timeout}ms (attempt ${reconnectAttempt + 1})`
-        );
+        setReconnectAttempt((prev) => {
+          const nextAttempt = prev + 1;
+          const timeout = Math.min(1000 * Math.pow(2, prev), 30000);
+          console.log(
+            `[WS] Reconnecting in ${timeout}ms (attempt ${nextAttempt})`
+          );
 
-        reconnectTimeoutRef.current = setTimeout(() => {
-          setReconnectAttempt((prev) => prev + 1);
-          connect();
-        }, timeout);
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connect();
+          }, timeout);
+
+          return nextAttempt;
+        });
       };
 
       wsRef.current = ws;
@@ -122,7 +205,7 @@ export function useWebSocket() {
         error instanceof Error ? error.message : "Failed to create WebSocket"
       );
     }
-  }, [reconnectAttempt]);
+  }, []);
 
   useEffect(() => {
     connect();
